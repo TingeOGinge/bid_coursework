@@ -45,9 +45,11 @@ def postVisualPreprocessing(data):
 
   data['FarePerPerson'] = data['Fare'] / (data['Relatives'] + 1)
 
-  data = data.drop(['Cabin', 'Name', 'Ticket', 'Embarked', 'Relatives'], axis=1)
+  data = data.drop(['Cabin', 'Name', 'Ticket', 'Embarked'], axis=1)
 
-  encodeList = ['AgeQuantile', 'Pclass', 'SoloTraveller', 'Sex']
+  data['Relatives'] = data.apply(lambda row: str(row['Relatives']) if row['Relatives'] < 7 else '6+', axis=1)
+
+  encodeList = ['AgeQuantile', 'Pclass', 'SoloTraveller', 'Sex', 'Title', 'Relatives']
   for encoding in encodeList:
     data = pd.concat([data, pd.get_dummies(data[encoding], prefix=encoding)], axis=1)
     data = data.drop(encoding, axis=1)
