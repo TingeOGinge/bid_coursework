@@ -1,43 +1,39 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
+from sklearn.metrics import confusion_matrix
+import pandas as pd
 
-# TODO: Create a catplot showing the relation from Pclases to survival
-# TODO: Draw correlation between survival and (SibSp || Parch)
+def mainVisuals(data):
 
-def embark(data):
-  # Display the count of the 'Embarked' values to show a disparity
-  # Results show the majority of passengers embarked from a single location
-  # Conclusion: data in relation to Embarked == Q will be less accurate than Embarked == S
+  pclassBarplot(data)
+
   print(data['Embarked'].value_counts() / len(data))
   embarkCountPlot(data)
 
-  # Does gender have an influence over this?
-  # Results show inconsistent relationships between gender/survival against embarked
-  # Conclusion: supports theory that smaller data sample will yield different results
   meanSex = data.groupby('Sex').mean()
   print(meanSex)
+
+  sexCatbarplot(data)
   embarkFacetGrid(data)
+  sexAgePointplot(data)
+
+  relativesPointplot(data)
 
 
-def sex(data):
-  sexCatplot(data)
-  sexAgePlot(data)
+def relativesPointplot(d):
+  sns.catplot('Relatives', 'Survived', hue='Sex', data=d, aspect=2.5, kind='point')
+  plt.show()
 
-def getAgeQuantile(row, percentiles):
-  if row['Age'] < percentiles[0]: return 25
-  elif row['Age'] < percentiles[1]: return 50
-  elif row['Age'] < percentiles[2]: return 75
-  else: return 100
+def pclassBarplot(d):
+  sns.barplot(x='Pclass', y='Survived', data=d)
+  plt.show()
 
-def sexAgePlot(d):
-  agePercent = np.percentile(d['Age'], [25,50,75,100])
-  d['AgeQuantile'] = d.apply(lambda x: getAgeQuantile(x, agePercent), axis=1)
-  sns.catplot(x='AgeQuantile', y='Survived', hue='Sex',data=d, kind='bar')
+def sexAgePointplot(d):
+  sns.catplot(x='AgeQuantile', y='Survived', hue='Sex',data=d, kind='point')
   plt.ylim(0,1)
   plt.show()
 
-def sexCatplot(d):
+def sexCatbarplot(d):
   sns.catplot(x='Sex', y='Survived', hue='Pclass', data=d, height=6, kind='bar')
   plt.show()
 
@@ -54,4 +50,15 @@ def embarkFacetGrid(data):
 def heatmap(data):
   plt.figure(figsize=(12,12))
   sns.heatmap(data.corr(), vmax=1, square=True, annot=True)
+  plt.show()
+
+def confusionM(y_true,y_predict,target_names):
+  cMatrix = confusion_matrix(y_true,y_predict)
+  df_cm = pd.DataFrame(cMatrix,index=target_names,columns=target_names)
+  plt.figure(figsize = (6,4))
+  cm = sns.heatmap(df_cm,annot=True,fmt="d")
+  cm.yaxis.set_ticklabels(cm.yaxis.get_ticklabels(),rotation=90)
+  cm.xaxis.set_ticklabels(cm.xaxis.get_ticklabels(),rotation=0)
+  plt.ylabel('True label')
+  plt.xlabel('Predicted label')
   plt.show()
