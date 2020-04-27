@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-
-# TODO: Engineer title feature with outliers described as so (preVisual)
+import re
 
 def getAgeQuantile(row, percentiles):
   if row['Age'] < percentiles[0]: return 5
@@ -12,16 +11,26 @@ def getAgeQuantile(row, percentiles):
   elif row['Age'] < percentiles[4]: return 75
   else: return 100
 
+def stripTitle(row):
+  pattern = r'^.+, ([^\.]+)'
+  result = re.findall(pattern, row['Name'])
+
+  if len(result) > 0: return result[0] if result[0] in ['Mr', 'Mrs', 'Miss', 'Master'] else 'Outlier'
+
+  return 'N/A'
+
 def preVisualPreprocessing(data):
   data['Embarked'] = data['Embarked'].fillna(data['Embarked'].mode())
 
   data['Age'] = data['Age'].fillna(data['Age'].median())
   agePercent = np.percentile(data['Age'], [5, 10, 25, 50, 75, 100])
-  print(f"Age Percnitile Range: {agePercent}")
+  print(f"Age Percenitile Range: {agePercent}")
   data['AgeQuantile'] = data.apply(lambda row: getAgeQuantile(row, agePercent), axis=1)
 
   data['Relatives'] = data['SibSp'] + data['Parch']
   data['SoloTraveller'] = data.apply(lambda row: 'No' if row['Relatives'] > 0 else 'Yes', axis=1)
+
+  data['Title'] = data.apply(stripTitle, axis=1)
 
   return data
 
@@ -31,6 +40,7 @@ def postVisualPreprocessing(data):
   minmaxScaler = preprocessing.MinMaxScaler()
 
   scalerList = ['Fare', 'Age', 'SibSp', 'Parch']
+
   for scale in scalerList: data[scale] = minmaxScaler.fit_transform(data[[scale]].values)
 
   data['FarePerPerson'] = data['Fare'] / (data['Relatives'] + 1)

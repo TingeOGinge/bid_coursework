@@ -12,6 +12,8 @@ def mainVisuals(data):
   print(data['Embarked'].value_counts() / len(data))
   embarkCountPlot(data)
 
+  titleCountPlot(data)
+
   meanSex = data.groupby('Sex').mean()
   print(meanSex)
 
@@ -21,6 +23,9 @@ def mainVisuals(data):
 
   relativesPointplot(data)
 
+def titleCountPlot(d):
+  sns.catplot(x='Title', hue='Survived', data=d, palette='Set1', kind='count', aspect=2.5)
+  plt.show()
 
 def relativesPointplot(d):
   sns.catplot('Relatives', 'Survived', hue='Sex', data=d, aspect=2.5, kind='point')
