@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import pandas as pd
 
+# TODO: Visualise correlations relating to title feature (create feature first and use heatmap for inspiration)
+
 def mainVisuals(data):
 
   pclassBarplot(data)
@@ -43,22 +45,21 @@ def embarkCountPlot(d):
 
 def embarkFacetGrid(data):
   fg = sns.FacetGrid(data, row='Embarked', height=5, aspect=1.6)
-  fg.map(sns.pointplot, 'Sex', 'Survived', 'Pclass', order=None, hue_order=None)
+  fg.map(sns.pointplot, 'Pclass', 'Survived', 'Sex', order=None, hue_order=None)
   fg.add_legend()
   plt.show()
 
 def heatmap(data):
-  plt.figure(figsize=(12,12))
-  sns.heatmap(data.corr(), vmax=1, square=True, annot=True)
+  plt.figure(figsize=(24,24))
+  sns.heatmap(data.corr(), vmax=1, square=True, annot=True, fmt='.2f')
   plt.show()
 
 def confusionM(y_true,y_predict,target_names):
   cMatrix = confusion_matrix(y_true,y_predict)
   df_cm = pd.DataFrame(cMatrix,index=target_names,columns=target_names)
   plt.figure(figsize = (6,4))
-  cm = sns.heatmap(df_cm,annot=True,fmt="d")
+  cm = sns.heatmap(df_cm,annot=True,fmt="2.0f")
   cm.yaxis.set_ticklabels(cm.yaxis.get_ticklabels(),rotation=90)
-  cm.xaxis.set_ticklabels(cm.xaxis.get_ticklabels(),rotation=0)
   plt.ylabel('True label')
   plt.xlabel('Predicted label')
   plt.show()

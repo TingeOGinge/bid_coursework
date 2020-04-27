@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 
+# TODO: Engineer title feature with outliers described as so (preVisual)
+
 def getAgeQuantile(row, percentiles):
   if row['Age'] < percentiles[0]: return 5
   elif row['Age'] < percentiles[1]: return 10
@@ -11,7 +13,6 @@ def getAgeQuantile(row, percentiles):
   else: return 100
 
 def preVisualPreprocessing(data):
-  data = data.set_index(['PassengerId'])
   data['Embarked'] = data['Embarked'].fillna(data['Embarked'].mode())
 
   data['Age'] = data['Age'].fillna(data['Age'].median())
@@ -36,7 +37,7 @@ def postVisualPreprocessing(data):
 
   data = data.drop(['Cabin', 'Name', 'Ticket', 'Embarked', 'Relatives'], axis=1)
 
-  encodeList = ['AgeQuantile', 'Pclass', 'SoloTraveller']
+  encodeList = ['AgeQuantile', 'Pclass', 'SoloTraveller', 'Sex']
   for encoding in encodeList:
     data = pd.concat([data, pd.get_dummies(data[encoding], prefix=encoding)], axis=1)
     data = data.drop(encoding, axis=1)
