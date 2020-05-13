@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import pandas as pd
 
-# TODO: Visualise correlations relating to title feature (create feature first and use heatmap for inspiration)
-
 def mainVisuals(data):
 
   pclassBarplot(data)
@@ -59,7 +57,7 @@ def heatmap(data):
   sns.heatmap(data.corr(), vmax=1, square=True, annot=True, fmt='.2f')
   plt.show()
 
-def confusionM(y_true,y_predict,target_names):
+def confusionM(y_true,y_predict,target_names, title):
   cMatrix = confusion_matrix(y_true,y_predict)
   df_cm = pd.DataFrame(cMatrix,index=target_names,columns=target_names)
   plt.figure(figsize = (6,4))
@@ -67,4 +65,5 @@ def confusionM(y_true,y_predict,target_names):
   cm.yaxis.set_ticklabels(cm.yaxis.get_ticklabels(),rotation=90)
   plt.ylabel('True label')
   plt.xlabel('Predicted label')
+  plt.title(title)
   plt.show()

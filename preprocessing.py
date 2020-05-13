@@ -4,7 +4,8 @@ from sklearn import preprocessing
 import re
 
 def getAgeQuantile(row, percentiles):
-  if row['Age'] < percentiles[0]: return 5
+  if row['Age'] < percentiles[0]:
+    return 5
   elif row['Age'] < percentiles[1]: return 10
   elif row['Age'] < percentiles[2]: return 25
   elif row['Age'] < percentiles[3]: return 50
@@ -21,6 +22,7 @@ def stripTitle(row):
 
 def preVisualPreprocessing(data):
   data['Embarked'] = data['Embarked'].fillna(data['Embarked'].mode())
+  data['Fare'] = data['Fare'].fillna(data['Fare'].median())
 
   data['Age'] = data['Age'].fillna(data['Age'].median())
   agePercent = np.percentile(data['Age'], [5, 10, 25, 50, 75, 100])
@@ -28,7 +30,6 @@ def preVisualPreprocessing(data):
   data['AgeQuantile'] = data.apply(lambda row: getAgeQuantile(row, agePercent), axis=1)
 
   data['Relatives'] = data['SibSp'] + data['Parch']
-  data['SoloTraveller'] = data.apply(lambda row: 'No' if row['Relatives'] > 0 else 'Yes', axis=1)
 
   data['Title'] = data.apply(stripTitle, axis=1)
 
@@ -45,11 +46,13 @@ def postVisualPreprocessing(data):
 
   data['FarePerPerson'] = data['Fare'] / (data['Relatives'] + 1)
 
-  data = data.drop(['Cabin', 'Name', 'Ticket', 'Embarked'], axis=1)
+  data['Maturity'] = data.apply(lambda row: "child" if row['AgeQuantile'] == 5 else 'Adult', axis=1)
 
-  data['Relatives'] = data.apply(lambda row: str(row['Relatives']) if row['Relatives'] < 7 else '6+', axis=1)
+  data = data.drop(['Cabin','Name','Ticket','AgeQuantile','Embarked','Age','SibSp','Parch','PassengerId'], axis=1)
 
-  encodeList = ['AgeQuantile', 'Pclass', 'SoloTraveller', 'Sex', 'Title', 'Relatives']
+  data['Relatives'] = data.apply(lambda row: str(row['Relatives']) if row['Relatives'] < 4 else '4+', axis=1)
+
+  encodeList = ['Pclass', 'Sex', 'Title', 'Relatives', 'Maturity']
   for encoding in encodeList:
     data = pd.concat([data, pd.get_dummies(data[encoding], prefix=encoding)], axis=1)
     data = data.drop(encoding, axis=1)
