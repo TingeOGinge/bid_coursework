@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 from titanic.preprocessing import preVisualPreprocessing, postVisualPreprocessing
-from titanic import analysis, visualisation as visuals
+from titanic import analysis, visualisation
 
 
 def writeOutput(final, dirname, train, test):
@@ -21,13 +21,13 @@ def main():
   train = preVisualPreprocessing(train)
   test = preVisualPreprocessing(test)
 
-  visualsFlag = input("Would you like to see the visualisations? (Y/N)") is "Y"
-  if visualsFlag: visuals.mainVisuals(train)
+  visualisationFlag = input("Would you like to see the visualisations? (Y/N)") is "Y"
+  if visualisationFlag: visualisation.mainVisuals(train)
 
   train = postVisualPreprocessing(train)
   test = postVisualPreprocessing(test)
 
-  if visualsFlag: visuals.heatmap(train)
+  if visualisationFlag: visualisation.heatmap(train)
 
   analysis.runBenchmarkTests(train)
 
